@@ -6,13 +6,15 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+import { BlockUser } from "./BlockUser"
 
 export default async function AdminLayout({children} : {children: React.ReactNode}) {
   const userCookies = await cookies()
   const userData = await API.getuser(userCookies)
   if (!userData.user?.isAdmin) {
-    redirect("/")
+    return (
+      <BlockUser />
+    )
   }
   return (
     <div className="[--header-height:calc(--spacing(14))]">
