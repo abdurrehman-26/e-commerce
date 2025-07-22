@@ -67,6 +67,13 @@ export type LoginFormData = {
   password: string;
 };
 
+export type SignupFormData = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
 export type TableProduct = {
   title: string,
   image: string,

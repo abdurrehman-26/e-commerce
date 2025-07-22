@@ -32,6 +32,34 @@ export default class API {
       console.error(error);
     }
   }
+  static async signup(name: string, email: string, password: string) {
+    const raw = JSON.stringify({
+      name,
+      email,
+      password,
+    });
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: raw,
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/signup`,
+        requestOptions,
+      )
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   static async logout(): Promise<{
     status: "success" | "failed",
     message: string
