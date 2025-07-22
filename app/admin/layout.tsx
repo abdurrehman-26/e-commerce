@@ -1,15 +1,19 @@
+import API from "@/API"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-export const iframeHeight = "800px"
-
-export const description = "A sidebar with a header and a search form."
-
-export default function AdminLayout({children} : {children: React.ReactNode}) {
+export default async function AdminLayout({children} : {children: React.ReactNode}) {
+  const userCookies = await cookies()
+  const userData = await API.getuser(userCookies)
+  if (!userData.user?.isAdmin) {
+    redirect("/")
+  }
   return (
     <div className="[--header-height:calc(--spacing(14))]">
       <SidebarProvider className="flex flex-col">

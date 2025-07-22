@@ -2,7 +2,6 @@
 
 import { SidebarIcon } from "lucide-react"
 
-import { SearchForm } from "@/components/search-form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -24,7 +23,6 @@ export function SiteHeader() {
         </Button>
         <Separator orientation="vertical" className="mr-2 h-4" />
         <SiteLogo />
-        <SearchForm className="w-full sm:ml-auto sm:w-auto" />
       </div>
     </header>
   )

@@ -88,7 +88,8 @@ export default class API {
     user: {
       name: string,
       email: string,
-      userID: string
+      userID: string,
+      isAdmin: boolean
     }
   }> {
     const requestHeaders = new Headers()
