@@ -12,19 +12,22 @@ import { toast } from "sonner";
 import { Product } from "@/types";
 import { addToCart } from "@/features/cart/cartSlice";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useRouter } from "next/navigation";
 
 export default function ProductPage() {
   const { id } = useParams();
   const [productData, setproductData] = useState<Product>();
 
   
-  const [cartQuantity, setCartQuantity] = useState(1)
+  const [productQuantity, setCartQuantity] = useState(1)
 
 
   const maxCartQuantity = 20
 
   const dispatch = useAppDispatch()
+  const isAuthenticated = useAppSelector(state => state.user.isAuthenticated)
+  const router = useRouter()
 
   useEffect(() => {
     async function fetchProductData() {
@@ -39,14 +42,14 @@ export default function ProductPage() {
     if (!productData) {
       return
     }
-    const added = await API.addToCart(productData._id, cartQuantity)
+    const added = await API.addToCart(productData._id, productQuantity)
     if (added.status === "success") {
       toast.success(added.message)
       dispatch(addToCart({
-        _id: productData._id,
+        productID: productData._id,
         title: productData.title,
         price: productData.price,
-        quantity: cartQuantity,
+        quantity: productQuantity,
         image: productData.images[0],
         slug: productData.slug
       }))
@@ -56,14 +59,14 @@ export default function ProductPage() {
   }
   
   const increaseCartQuantity = () => {
-    if (cartQuantity === maxCartQuantity) {
+    if (productQuantity === maxCartQuantity) {
       return
     }
     setCartQuantity((prev) => prev+1)
   }
 
   const decreaseCartQuantity = () => {
-    if (cartQuantity === 1) {
+    if (productQuantity === 1) {
       return
     }
     setCartQuantity((prev) => prev-1)
@@ -82,6 +85,17 @@ export default function ProductPage() {
   if (!productData) return <div>Loading product...</div>;
   
   const {title, description, images, price, compare_at_price} = productData
+
+  const BuyNowHandle = async() => {
+      if (!isAuthenticated) {
+        router.push(`/login`)
+      } else {
+        const response = await API.createCheckoutSession("buyNow", productData._id, productQuantity)
+        if (response.status === "success") {
+          router.push(`/checkout/${response.session.token}`)
+        }
+      }
+    }
 
   return (
     <>
@@ -107,7 +121,7 @@ export default function ProductPage() {
               <Input
                 className="outline-none w-12 text-center"
                 type="text"
-                value={cartQuantity}
+                value={productQuantity}
                 onChange={onCartQuantityChange}
               />
               <Button onClick={increaseCartQuantity} variant="ghost" className="flex hover:bg-transparent hover:dark:bg-transparent cursor-pointer items-center justify-center p-4">
@@ -127,6 +141,7 @@ export default function ProductPage() {
             <Button
               className="text-center cursor-pointer  py-6 text-xl rounded-full font-semibold w-full"
               size="lg"
+              onClick={BuyNowHandle}
             >
               Buy Now
             </Button>

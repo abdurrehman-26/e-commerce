@@ -12,6 +12,7 @@ import { notFound } from "next/navigation";
 import MyOrderCancelButton from "./my-order-cancel-button";
 import { Clock, CreditCard, DollarSign, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PaymentID } from "./paymentID";
 
 export default async function OrderDetailPage({params}: {params: Promise<{orderId: string}>}) {
   const {orderId} = await params
@@ -42,10 +43,10 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
           </BreadcrumbList>
         </Breadcrumb>
         <h1 className="text-2xl font-bold mb-2">Order #{order.orderNo}</h1>
-        <p className="text-sm text-gray-600 mb-4">Placed on: {formatDate(order.createdAt).toLocaleString()}</p>
+        <p className="text-sm text-foreground-400 mb-4">Placed on: {formatDate(order.createdAt).toLocaleString()}</p>
 
         <div className="w-full mx-auto py-6">
-          <h2 className="mb-5 text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <h2 className="mb-5 text-2xl font-bold text-foreground-800 flex items-center gap-2">
             <Truck className="h-7 w-7 text-indigo-600" />
             Order Details
           </h2>
@@ -53,8 +54,8 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
           <div className="space-y-4">
             {/* Order Status */}
             <div className="flex items-center justify-between">
-              <p className="text-gray-700 font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5 text-gray-500" /> Status:
+              <p className="text-foreground-700 font-semibold flex items-center gap-2">
+                <Clock className="h-5 w-5 text-foreground-500" /> Status:
               </p>
               {order.status === 'pending' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 px-3 py-1 rounded-full text-sm">Pending</Badge>}
               {order.status === 'processing' && <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 px-3 py-1 rounded-full text-sm">Processing</Badge>}
@@ -66,16 +67,16 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
 
             {/* Payment Method */}
             <div className="flex items-center justify-between">
-              <p className="text-gray-700 font-semibold flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-gray-500" /> Payment method:
+              <p className="text-foreground-700 font-semibold flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-foreground-500" /> Payment method:
               </p>
-              <p className="text-gray-800 capitalize text-sm">{order.paymentMethod}</p>
+              <p className="text-foreground-800 capitalize text-sm">{order.paymentMethod}</p>
             </div>
 
             {/* Payment Status */}
             <div className="flex items-center justify-between">
-              <p className="text-gray-700 font-semibold flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-gray-500" /> Payment status:
+              <p className="text-foreground-700 font-semibold flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-foreground-500" /> Payment status:
               </p>
               {order.paymentStatus === 'paid' && <Badge className="bg-green-50 text-green-700 border-green-300 px-3 py-1 rounded-full text-sm">Paid</Badge>}
               {order.paymentStatus === 'unpaid' && <Badge variant="destructive" className="px-3 py-1 rounded-full text-sm">Unpaid</Badge>}
@@ -85,10 +86,10 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
             {/* Payment ID (conditionally rendered) */}
             {order.paymentMethod === 'card' && order.stripePaymentId && (
               <div className="flex items-center justify-between">
-                <p className="text-gray-700 font-semibold flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-gray-500" /> Payment ID:
+                <p className="text-foreground-700 font-semibold flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-foreground-500" /> Payment ID:
                 </p>
-                <p className="text-sm font-mono text-gray-600 truncate max-w-[150px] sm:max-w-none">{order.stripePaymentId}</p>
+                <PaymentID paymentID={order.stripePaymentId} />
               </div>
             )}
           </div>
@@ -118,7 +119,7 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
         </div>
       
         <div className="border-t py-8 mt-8"> {/* Increased padding and margin for more space */}
-          <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+          <h3 className="text-2xl font-bold text-foreground-800 mb-6 flex items-center gap-3">
             Delivery & Billing Addresses
           </h3>
 

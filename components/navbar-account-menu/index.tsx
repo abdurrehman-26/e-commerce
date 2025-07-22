@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
-import { CircleUserRound, LogOut, Package2, Settings, User } from 'lucide-react';
+import { CircleUserRound, LogOut, Package2, User } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import API from '@/API';
 import { clearUser } from '@/features/user/userSlice';
@@ -29,11 +29,6 @@ function NavbarAccountMenu() {
       title: "My orders",
       link: "/my-orders"
     },
-    {
-      icon: Settings,
-      title: "Settings",
-      link: "/settings"
-    }
   ]
 
   const router = useRouter()

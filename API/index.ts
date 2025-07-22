@@ -361,7 +361,7 @@ export default class API {
       console.error(error);
     }
   }
-  static async createCheckoutSession(mode: string, productID?: string, quantity?: number) {
+  static async createCheckoutSession(mode: 'buyNow' | 'cart', productID?: string, quantity?: number) {
     const raw = JSON.stringify({mode, productID, quantity});
     const requestOptions: RequestInit = {
       method: "POST",

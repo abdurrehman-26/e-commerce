@@ -124,7 +124,9 @@ export function ProductTable({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View Product</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/product/${row.original.slug}`}>View Product</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href={`/admin/products/edit/${row.original.slug}`}>Edit Product</Link>
             </DropdownMenuItem>
