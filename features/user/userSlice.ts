@@ -5,6 +5,7 @@ export type UserData = {
   name: string
   email: string
   userID: string
+  isAdmin: boolean
 }
 
 export type UserState = {
