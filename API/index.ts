@@ -32,6 +32,33 @@ export default class API {
       console.error(error);
     }
   }
+  static async checkLogin({userCookies}: {userCookies?: ReadonlyRequestCookies}): Promise<{
+    login: boolean,
+    message: string
+  }> {
+    const requestHeaders = new Headers()
+    if (userCookies) {
+      requestHeaders.append("Cookie", userCookies.toString())
+    }
+    const requestOptions: RequestInit = {
+      method: "GET",
+      redirect: "follow",
+      headers: requestHeaders,
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/checklogin`,
+        requestOptions,
+      )
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
   static async signup(name: string, email: string, password: string) {
     const raw = JSON.stringify({
       name,
