@@ -31,6 +31,11 @@ const userSlice = createSlice({
       state.isAuthenticated = true
       state.error = null
     },
+    setName(state, action: PayloadAction<{newName: string}>) {
+      if (state.data) {
+        state.data.name = action.payload.newName
+      }
+    },
     clearUser(state) {
       state.isAuthenticated = false
       state.data = null
@@ -45,5 +50,5 @@ const userSlice = createSlice({
   }
 })
 
-export const { setUser, clearUser, setLoading, setError } = userSlice.actions
+export const { setUser, clearUser, setLoading, setError, setName } = userSlice.actions
 export default userSlice.reducer
