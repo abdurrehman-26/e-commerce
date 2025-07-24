@@ -100,10 +100,10 @@ export default function OrderPriceSummary({
             <td className="py-2 text-right">{capitalize(status)}</td>
           </tr>
           {paymentMethod === 'card' && paymentID && (
-            <>
+            <tr>
              <td className="py-2 font-medium text-gray-700">Payment ID:</td>
              <td className="py-2 text-right">{paymentID}</td>
-            </>
+            </tr>
           )}
         </tbody>
       </table>

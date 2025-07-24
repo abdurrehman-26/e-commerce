@@ -13,6 +13,7 @@ import MyOrderCancelButton from "./my-order-cancel-button";
 import { Clock, CreditCard, DollarSign, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaymentID } from "./paymentID";
+import { removeUnderScore } from "@/lib/utils";
 
 export default async function OrderDetailPage({params}: {params: Promise<{orderId: string}>}) {
   const {orderId} = await params
@@ -70,7 +71,7 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
               <p className="text-foreground-700 font-semibold flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-foreground-500" /> Payment method:
               </p>
-              <p className="text-foreground-800 capitalize text-sm">{order.paymentMethod}</p>
+              <p className="text-foreground-800 capitalize text-sm">{removeUnderScore(order.paymentMethod)}</p>
             </div>
 
             {/* Payment Status */}
@@ -99,7 +100,7 @@ export default async function OrderDetailPage({params}: {params: Promise<{orderI
             {order.status === 'pending' && (
               <MyOrderCancelButton />
             )}
-            {order.paymentStatus === 'unpaid' && (
+            {order.paymentStatus === 'unpaid' && order.paymentMethod === "card" && (
               <Button size="sm" asChild className="w-full sm:w-auto">
                 <Link href={`/retry-order-payment/${order._id}`} className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4" /> Retry Payment
