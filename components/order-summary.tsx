@@ -15,9 +15,12 @@ function OrderSummary() {
     state.cart.items.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0)
   );
   const isAuthenticated = useAppSelector(state => state.user.isAuthenticated)
+  const cartItems = useAppSelector(state => state.cart.items)
 
   const CheckOutHandle = async() => {
-    if (!isAuthenticated) {
+    if (cartItems.length === 0) {
+      router.push(`/`)
+    } else if (!isAuthenticated) {
       router.push(`/login`)
     } else {
       const response = await API.createCheckoutSession("cart")
@@ -38,7 +41,7 @@ function OrderSummary() {
           })}
         </p>
       </div>
-      <Button className='rounded-md cursor-pointer' onClick={CheckOutHandle}>{isAuthenticated ? "Proceed to checkout": "Login to checkout"}</Button>
+      <Button className='rounded-md cursor-pointer' onClick={CheckOutHandle}>{cartItems.length === 0 ? "Continue shopping" : isAuthenticated ? "Proceed to checkout": "Login to checkout"}</Button>
     </div>
   )
 }

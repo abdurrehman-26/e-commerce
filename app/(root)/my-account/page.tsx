@@ -29,12 +29,12 @@ const AccountPage = () => {
           <Link
             key={link.href}
             href={link.href}
-            className="transition hover:shadow-md rounded-2xl"
+            className="transition rounded-2xl"
           >
-            <Card className="h-full">
+            <Card className="h-full group">
               <CardHeader className="flex flex-row items-center gap-3">
                 <div className="p-2 rounded-md bg-muted">{link.icon}</div>
-                <CardTitle className="text-lg">{link.title}</CardTitle>
+                <CardTitle className="text-lg group-hover:underline underline-offset-2">{link.title}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
