@@ -3,6 +3,7 @@ import React from 'react'
 import { AddressSelectorDialog } from '../address-selector-dialog';
 
 export type Address = {
+  addressName: string;
   _id: string;
   fullName: string;
   addressLine1: string;
@@ -14,6 +15,7 @@ export type Address = {
     code: string
   };
   phone: string
+  isDefault?: boolean
 };
 
 type CheckoutAddressSelectionProps = {

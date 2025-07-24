@@ -485,7 +485,85 @@ export default class API {
       console.error(error);
     }
   }
-  static async getUserAddresses(userCookies?: ReadonlyRequestCookies) {
+  static async AddAddress({address, userCookies}:{address: Address, userCookies?: ReadonlyRequestCookies}): Promise<{status: "success" | "failed", message: string, addedAddress: Address}> {
+    const requestHeaders = new Headers()
+    if (userCookies) {
+      requestHeaders.append("Cookie", userCookies.toString());
+    }
+    requestHeaders.append("Content-Type", "application/json")
+    const raw = JSON.stringify({...address})
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: requestHeaders,
+      redirect: "follow",
+      body: raw,
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/addresses/add`,
+        requestOptions,
+      );
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
+  static async updateAddress({addressID, address, userCookies}:{addressID: string, address: Address, userCookies?: ReadonlyRequestCookies}): Promise<{status: "success" | "failed", message: string, updatedAddress: Address}> {
+    const requestHeaders = new Headers()
+    if (userCookies) {
+      requestHeaders.append("Cookie", userCookies.toString());
+    }
+    requestHeaders.append("Content-Type", "application/json")
+    const raw = JSON.stringify({...address})
+    const requestOptions: RequestInit = {
+      method: "PATCH",
+      headers: requestHeaders,
+      redirect: "follow",
+      body: raw,
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/addresses/update/${addressID}`,
+        requestOptions,
+      );
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
+  static async deleteAddress({addressID, userCookies}:{addressID: string, userCookies?: ReadonlyRequestCookies}): Promise<{status: "success" | "failed", message: string, updatedAddress: Address}> {
+    const requestHeaders = new Headers()
+    if (userCookies) {
+      requestHeaders.append("Cookie", userCookies.toString());
+    }
+    const requestOptions: RequestInit = {
+      method: "DELETE",
+      headers: requestHeaders,
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/addresses/delete/${addressID}`,
+        requestOptions,
+      );
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
+  static async getUserAddresses(userCookies?: ReadonlyRequestCookies): Promise<{status: "success" | "failed", message: string, addresses: Address[]}> {
     const requestHeaders = new Headers()
     if (userCookies) {
         requestHeaders.append("Cookie", userCookies.toString());
@@ -506,31 +584,7 @@ export default class API {
 
       return result;
     } catch (error) {
-      console.error(error);
-    }
-  }
-  static async searchProducts(query: string, userCookies?: ReadonlyRequestCookies) {
-    const requestHeaders = new Headers()
-    if (userCookies) {
-        requestHeaders.append("Cookie", userCookies.toString());
-    }
-    const requestOptions: RequestInit = {
-      method: "GET",
-      headers: requestHeaders,
-      redirect: "follow",
-      credentials: "include",
-    };
-
-    try {
-      const response = await fetch(
-        `${API_SERVER}/api/v1/search?q=${query}`,
-        requestOptions,
-      );
-      const result = await response.json();
-
-      return result.searchResults;
-    } catch (error) {
-      console.error(error);
+      throw error
     }
   }
   static async createPaymentIntent(orderId: string): Promise<{status: string, clientSecret: string, message: string}> {

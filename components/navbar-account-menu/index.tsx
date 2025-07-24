@@ -22,7 +22,7 @@ function NavbarAccountMenu() {
     {
       icon: User,
       title: "My account",
-      link: "/account-center"
+      link: "/my-account"
     },
     {
       icon: Package2,
