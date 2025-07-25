@@ -19,6 +19,7 @@ import { LoginFormData } from "@/types"
 import { setCart } from "@/features/cart/cartSlice";
 import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export function 
 LoginForm({
@@ -41,11 +42,14 @@ LoginForm({
           email: res.loggedinuser.email,
           name: res.loggedinuser.name,
           userID: res.loggedinuser._id,
+          isAdmin: res.loggedinuser.isAdmin
         }),
       );
       const cartData = await API.getCart()
       dispatch(setCart(cartData.cart.items))
       router.push("/");
+    } else {
+      toast.error(res.message)
     }
   };
 

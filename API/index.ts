@@ -93,6 +93,36 @@ export default class API {
       throw error
     }
   }
+  static async updatePassword({oldPassword, newPassword}:{oldPassword: string, newPassword: string}): Promise<{
+    status: "success" | "failed",
+    message: string
+  }> {
+    const raw = JSON.stringify({
+      oldPassword,
+      newPassword
+    });
+    const requestOptions: RequestInit = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: raw,
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/update-password`,
+        requestOptions,
+      )
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
   static async signup(name: string, email: string, password: string) {
     const raw = JSON.stringify({
       name,

@@ -24,6 +24,7 @@ const ProfilePage = () => {
     }
   }
   const [changeNameDialogState, setChangeNameDialogState] = useState<boolean>(false)
+  const [changePasswordDialogState, setChangePasswordDialogState] = useState<boolean>(false)
   return (
     <div className="w-full max-w-3xl mx-auto py-10 px-4 space-y-8">
       {/* Page Heading */}
@@ -60,7 +61,7 @@ const ProfilePage = () => {
             <CardTitle className="text-lg font-semibold">Password</CardTitle>
             <p className="text-sm text-muted-foreground">You can update your login password here.</p>
           </div>
-          <ChangePasswordDialog>
+          <ChangePasswordDialog open={changePasswordDialogState} setOpen={setChangePasswordDialogState}>
             <Button variant="outline" size="sm">
               <KeyRound className="w-4 h-4 mr-1" />
               Change

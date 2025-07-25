@@ -12,15 +12,20 @@ interface NameFormValues {
 }
 
 const ChangeNameDialog = ({initialName, children, onSubmit, open, onOpenChange }: {initialName?: string, children: React.ReactNode, onSubmit: (data: NameFormValues) => void, open: boolean, onOpenChange: (state: boolean) => void }) => {
-  const {register, handleSubmit, formState} = useForm<NameFormValues>({
+  const {register, handleSubmit, formState, reset} = useForm<NameFormValues>({
     defaultValues: {
       newName: initialName
-    },
+    }
   })
   const handleFormSubmit = (data: NameFormValues) => {
     onSubmit(data)
     onOpenChange(false)
   }
+  React.useEffect(() => {
+    reset({
+      newName: initialName
+    })
+  }, [open, reset, initialName])
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -32,10 +37,10 @@ const ChangeNameDialog = ({initialName, children, onSubmit, open, onOpenChange }
         <form onSubmit={handleSubmit(handleFormSubmit)} className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="newName">Name</Label>
-            <Input id="newName" placeholder="Enter your full name" {...register('newName', { required: 'Required' })} />
+            <Input id="newName" placeholder="Enter your full name" {...register('newName', { required: 'Required', validate: (newName) => newName !== initialName })} />
             {formState.errors.newName && <p className="text-sm text-red-600">{formState.errors.newName.message}</p>}
           </div>
-          <Button type="submit" className="mt-2 w-full">
+          <Button type="submit" className="mt-2 w-full" disabled={!formState.isValid}>
             Update Name
           </Button>
         </form>
