@@ -2,19 +2,19 @@
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
 import Link from 'next/link'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
-import { CircleUserRound, LogOut, Package2, User } from 'lucide-react';
+import { CircleUserRound, LayoutDashboard, LogOut, Package2, User } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import API from '@/API';
 import { clearUser } from '@/features/user/userSlice';
 import { clearCart } from '@/features/cart/cartSlice';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 function NavbarAccountMenu() {
-  const isLoggedIn = useSelector<RootState>(state => state.user.isAuthenticated)
+  const isLoggedIn = useAppSelector(state => state.user.isAuthenticated)
+  const isAdmin = useAppSelector(state => state.user.data?.isAdmin)
 
   const [dialogState, setDialogState] = useState<boolean>(false)
 
@@ -33,7 +33,7 @@ function NavbarAccountMenu() {
 
   const router = useRouter()
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   if (!isLoggedIn) {
     return (
@@ -66,6 +66,17 @@ function NavbarAccountMenu() {
           <DropdownMenuContent className='mt-1 min-w-[200px] mr-4 rounded-sm'>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {isAdmin && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin">
+                    <LayoutDashboard />
+                    Admin Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             {user_links.map((user_link) => (
               <DropdownMenuItem key={user_link.title} className='cursor-pointer p-2 text-md' asChild>
                 <Link href={user_link.link}>
