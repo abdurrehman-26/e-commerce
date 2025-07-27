@@ -15,6 +15,14 @@ export const ImageUpload: React.FC<Props> = ({ onUpload }) => {
   try {
     const signres = await fetch(
       `${API_SERVER}/api/v1/cloudinary/signature`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        credentials: "include",
+      }
     );
     const signData: signData = await signres.json();
 
