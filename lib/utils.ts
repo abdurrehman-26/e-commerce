@@ -1,3 +1,4 @@
+import { Address } from "@/components/checkout-address-selection";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -25,3 +26,22 @@ export function capitalize(str: string) {
 export function removeUnderScore(str: string) {
   return str.replace(/_/g, " ")
 }
+
+export function upsertAddressList(
+  list: Address[],
+  newAddress: Address
+): Address[] {
+  const exists = list.find(addr => addr._id === newAddress._id);
+  if (exists) {
+    return list.map(addr =>
+      addr._id === newAddress._id
+        ? newAddress
+        : newAddress.isDefault ? { ...addr, isDefault: false } : addr
+    );
+  }
+  return [
+    newAddress,
+    ...list.map(addr => newAddress.isDefault ? { ...addr, isDefault: false } : addr)
+  ];
+}
+

@@ -68,53 +68,32 @@ const AccountAddresses = ({ initialAddresses }: AccountAddressesProps) => {
     setDeleteDialogOpen(false)
   }
 
-  const submitAddress = async (data: Address) => {
-    if (!selectedAddress) {
-      const addAddress = await API.AddAddress({address: data})
-      if (addAddress.status === "success") {
-        setAddresses((prev) => {
-          const newAddress = addAddress.addedAddress;
+  const submitAddress = (data: Address) => {
+    setAddresses(prev => {
+      const exists = prev.find(addr => addr._id === data._id);
 
-          // If it's default, unset default on all others
-          if (newAddress.isDefault) {
-            return [newAddress, ...prev.map(addr => ({ ...addr, isDefault: false }))];
-          }
-
-          // Otherwise, just prepend
-          return [newAddress, ...prev];
-        });
-        toast.success("Address added successfully.")
+      if (exists) {
+        // Updating existing
+        if (data.isDefault) {
+          return prev.map(addr =>
+            addr._id === data._id
+              ? data
+              : { ...addr, isDefault: false }
+          );
+        }
+        return prev.map(addr => (addr._id === data._id ? data : addr));
       } else {
-        toast.error("failed to add address.")
+        // Adding new
+        if (data.isDefault) {
+          return [data, ...prev.map(addr => ({ ...addr, isDefault: false }))];
+        }
+        return [data, ...prev];
       }
-    } else {
-      const updateAddress = await API.updateAddress({addressID: data._id, address: data})
-      if (updateAddress.status === "success") {
-        setAddresses((prev) => {
-          const updated = updateAddress.updatedAddress;
+    });
 
-          // If the updated address is set as default
-          if (updated.isDefault) {
-            return prev.map((addr) =>
-              addr._id === updated._id
-                ? updated
-                : { ...addr, isDefault: false }
-            );
-          } else {
-            // Otherwise, just replace the updated address
-            return prev.map((addr) =>
-              addr._id === updated._id ? updated : addr
-            );
-          }
-        });
-        toast.success("Address updated successfully.")
-      } else {
-        toast.error("failed to update address.")
-      }
-    }
+    setSelectedAddress(null);
+  };
 
-    setSelectedAddress(null)
-  }
 
   return (
     <div className="w-full max-w-3xl py-6 space-y-6">

@@ -13,8 +13,8 @@ export default async function CheckoutPage({params}: { params: Promise<CheckoutP
     const checkoutSession = await API.getCheckoutSession(token, userCookies)
     const addresses = await API.getUserAddresses(userCookies)
     return (
-      <StripeWrapper>
-        <CheckoutForm session={checkoutSession.session} addresses={addresses.addresses} />
+      <StripeWrapper >
+        <CheckoutForm session={checkoutSession.session} initialAddresses={addresses.addresses} />
       </StripeWrapper>
     )
 }

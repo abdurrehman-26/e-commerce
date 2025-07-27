@@ -10,14 +10,14 @@ type StripeWrapperProps = {
 };
 
 const StripeWrapper = ({children}: StripeWrapperProps) => {
-  const stripeOptions: StripeElementsOptions ={
+  const stripeOptions: StripeElementsOptions = {
     mode: "payment",
     amount: 15000,
     currency: "pkr",
     appearance: {
       theme: "stripe"
     },
-  }
+  };
 
   return (
     <Elements stripe={stripePromise} options={stripeOptions}>

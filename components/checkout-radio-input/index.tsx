@@ -17,7 +17,7 @@ const CheckoutRadioInput = ({
     <Label className={cn('flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all',
       selected
       ? "border-primary bg-muted shadow-sm"
-      : "border-border hover:border-muted"
+      : "border-border"
     )}>
       <div>
         <Input type='radio' {...props} checked={selected} />

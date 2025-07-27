@@ -5,8 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { useEffect } from 'react'
+import API from '@/API'
+import { toast } from 'sonner'
+import { Address } from '../checkout-address-selection'
 
 export type AddressFormValues = {
   _id: string
@@ -21,14 +23,25 @@ export type AddressFormValues = {
   }
   postalCode: string
   phone: string
-  isDefault?: boolean
 }
 
 type AddressDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialAddress?: AddressFormValues | null
-  onSubmit: (data: AddressFormValues) => void
+  onSubmit: (data: Address) => void
+}
+
+const EMPTY_ADDRESS: AddressFormValues = {
+  _id: '',
+  addressName: '',
+  fullName: '',
+  addressLine1: '',
+  addressLine2: '',
+  city: '',
+  postalCode: '',
+  phone: '',
+  country: { name: '', code: '' },
 }
 
 export const AddressDialog = ({
@@ -40,52 +53,38 @@ export const AddressDialog = ({
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
-    watch,
     formState: { errors },
   } = useForm<AddressFormValues>({
-    defaultValues: {
-      _id: '',
-      addressName: '',
-      fullName: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      country: {
-        name: '',
-        code: ''
-      },
-      postalCode: '',
-      phone: '',
-      isDefault: false,
-    },
+    defaultValues: EMPTY_ADDRESS
   })
 
   useEffect(() => {
     if (initialAddress) {
       reset(initialAddress)
     } else {
-      reset({
-        _id: '',
-        addressName: '',
-        fullName: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        country: {
-          name: '',
-          code: ''
-        },
-        postalCode: '',
-        phone: '',
-        isDefault: false,
-      })
+      reset(EMPTY_ADDRESS)
     }
   }, [initialAddress, reset, open])
 
-  const submit = (data: AddressFormValues) => {
-    onSubmit(data)
+  const submit = async (data: AddressFormValues) => {
+    if (!initialAddress) {
+      const addAddress = await API.AddAddress({address: data})
+      if (addAddress.status === "success") {
+        toast.success("Address added successfully.")
+        onSubmit(addAddress.addedAddress)
+      } else {
+        toast.error("failed to add address.")
+      }
+    } else {
+      const updateAddress = await API.updateAddress({addressID: data._id, address: data})
+      if (updateAddress.status === "success") {
+        toast.success("Address updated successfully.")
+        onSubmit(updateAddress.updatedAddress)
+      } else {
+        toast.error("failed to update address.")
+      }
+    }
     onOpenChange(false)
     reset()
   }
@@ -97,7 +96,7 @@ export const AddressDialog = ({
           <DialogTitle>{initialAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(submit)} id="address-form" className="flex flex-col flex-1 overflow-hidden">
+        <form onSubmit={handleSubmit(submit)} className="flex flex-col flex-1 overflow-hidden">
           <div className="overflow-y-auto p-2 space-y-4 flex-1">
             <div className="space-y-2">
               <Label>Address Name</Label>
@@ -146,20 +145,10 @@ export const AddressDialog = ({
               <Input {...register('phone', { required: 'Required' })} placeholder="+92 300 1234567" />
               {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
             </div>
-
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox
-                id="isDefault"
-                checked={watch('isDefault')}
-                onCheckedChange={checked => setValue('isDefault', !!checked)}
-                disabled={initialAddress?.isDefault}
-              />
-              <Label htmlFor="isDefault">Set as default address</Label>
-            </div>
           </div>
 
           <DialogFooter className='pt-4'>
-            <Button type="submit" form="address-form">
+            <Button type="submit">
               {initialAddress ? 'Update' : 'Save'}
             </Button>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

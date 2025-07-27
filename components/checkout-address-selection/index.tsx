@@ -19,43 +19,48 @@ export type Address = {
 };
 
 type CheckoutAddressSelectionProps = {
-  addresses: Address[],
-  addressFieldName: string,
-  value?: Address; // currently selected address
-  onChange?: (val: Address) => void;
-}
+  addresses: Address[];
+  selectedAddress: Address;
+  onSelect: (address: Address) => void;
+};
 
 const CheckoutAddressSelection = ({
   addresses,
-  addressFieldName,
-  value,
-  onChange
+  selectedAddress,
+  onSelect
 }: CheckoutAddressSelectionProps) => {
-  const selectedAddress = value ?? addresses[0];
+
   return (
-    <div>
-      <p className="text-lg font-semibold mb-1">{addressFieldName}</p>
-      <div className="border rounded-md p-4 bg-white">
-          <div className="flex justify-between items-start">
-          <div>
-              <p className="font-semibold">{selectedAddress.fullName}</p>
-              <p>{selectedAddress.addressLine1}</p>
-              {selectedAddress.addressLine2 && <p>{selectedAddress.addressLine2}</p>}
-              <p>
-              {selectedAddress.city}, {selectedAddress.postalCode}, {selectedAddress.country.name}
-              </p>
-          </div>
-          <AddressSelectorDialog
+    <div className="border rounded-md p-4 bg-white">
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm text-muted-foreground mb-1">
+            {selectedAddress.addressName}
+          </p>
+          <p className="font-medium">{selectedAddress.fullName}</p>
+          <p>{selectedAddress.addressLine1}</p>
+          {selectedAddress.addressLine2 && (
+            <p>{selectedAddress.addressLine2}</p>
+          )}
+          <p>
+            {selectedAddress.city}, {selectedAddress.postalCode},{" "}
+            {selectedAddress.country.name}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {selectedAddress.phone}
+          </p>
+        </div>
+
+        <AddressSelectorDialog
           addresses={addresses}
-          onSelect={(newAddress) => {
-            if (onChange) onChange(newAddress);
-          }}
           currentAddressId={selectedAddress._id}
-          />
-          </div>
+          onSelect={(newAddress) => {
+            onSelect(newAddress);
+          }}
+        />
       </div>
     </div>
-  )
+  );
 }
 
 export default CheckoutAddressSelection

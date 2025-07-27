@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import React, { useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import CheckoutRadioInput from "../checkout-radio-input";
 import CheckoutAddressSelection from "../checkout-address-selection";
 import { Address } from "../checkout-address-selection";
@@ -13,6 +13,10 @@ import { Check, LoaderCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch } from "react-redux";
 import { clearCart } from "@/features/cart/cartSlice";
+import { AddressDialog } from "../address-dialog";
+import { upsertAddressList } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
 
 type CheckoutItemProduct = {
   _id: string
@@ -44,7 +48,7 @@ export type CheckoutSession = {
 
 type CheckoutFormProps = {
   session: CheckoutSession;
-  addresses: Address[];
+  initialAddresses: Address[];
 };
 
 type CheckoutFormValues = {
@@ -52,7 +56,9 @@ type CheckoutFormValues = {
   checkoutSessionToken: string
 }
 
-const CheckoutForm = ({session, addresses}: CheckoutFormProps) => {
+export const AddressContext = createContext<{setAddressDialogOpen: React.Dispatch<React.SetStateAction<boolean>>} | undefined>(undefined);
+
+const CheckoutForm = ({session, initialAddresses}: CheckoutFormProps) => {
   const { register, handleSubmit, formState, watch } = useForm<CheckoutFormValues>({
     defaultValues: {
       paymentMethod: "cash_on_delivery", // default selected radio
@@ -62,13 +68,6 @@ const CheckoutForm = ({session, addresses}: CheckoutFormProps) => {
 
   const paymentMethod = watch("paymentMethod");
 
-  useEffect(() => {
-    elements?.update({
-      amount: Math.round(session.total * 100)
-  });
-  })
-
-  
   const stripe = useStripe();
   const elements = useElements();
 
@@ -76,9 +75,11 @@ const CheckoutForm = ({session, addresses}: CheckoutFormProps) => {
 
   const dispatch = useDispatch()
 
-  const [shippingAddress, setShippingAddress] = useState(session.shippingAddress)
+  const [addresses, setAddresses] = useState<Address[] | []>(initialAddresses || [])
 
-  const [billingAddress, setBillingAddress] = useState(session.billingAddress)
+  const [shippingAddress, setShippingAddress] = useState<Address | null>(session.shippingAddress || null)
+
+  const [billingAddress, setBillingAddress] = useState<Address | null>(session.billingAddress || null)
 
   const shippingAddressChangeHandle = async (address: Address) => {
     const previous = shippingAddress;
@@ -114,9 +115,17 @@ const CheckoutForm = ({session, addresses}: CheckoutFormProps) => {
     }
   };
 
+  const updateAddressesState = async (newAddress: Address) => {
+    if (addresses.length === 0) {
+      shippingAddressChangeHandle(newAddress)
+      billingAddressChangeHandle(newAddress)
+    }
+    setAddresses(prev => upsertAddressList(prev, newAddress));
+  };
+
   const onSubmit = async (data: CheckoutFormValues) => {
 
-    if (formState.isSubmitting || formState.isSubmitted) {
+    if (formState.isSubmitting || formState.isSubmitted || !shippingAddress || !billingAddress) {
       return
     }
     const orderCreated = await API.createorder(data.checkoutSessionToken, data.paymentMethod)
@@ -167,84 +176,148 @@ const CheckoutForm = ({session, addresses}: CheckoutFormProps) => {
 
     }
   }
+
+  const [useSameAddress, setUseSameAddress] = useState<boolean>(
+    shippingAddress && billingAddress
+      ? shippingAddress._id === billingAddress._id
+      : true
+  );
+
+
+  const [addressDialogOpen, setAddressDialogOpen] = useState<boolean>(false)
+
   return (
-      <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col justify-between md:flex-row gap-4">
-        <div className="flex-3/4 flex-col">
-          <h1 className="text-xl font-semibold my-3">Checkout</h1>
+    <AddressContext.Provider value={{setAddressDialogOpen}}>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col md:flex-row gap-6">
+        {/* LEFT SIDE - Main checkout form */}
+        <div className="w-full md:flex-1 space-y-6">
+          <h2 className="text-2xl font-bold">Checkout</h2>
 
-          <div className="space-y-6 mb-6">
-
-            {/* shippingAddress selector */}
+          {/* SHIPPING ADDRESS */}
+          <div className="p-4 rounded-xl border bg-muted/50 space-y-2">
+            <p className="font-semibold">Shipping address</p>
+            {addresses.length === 0 ? (
+              <div className="p-4 rounded-md border border-dashed text-center space-y-2">
+                <p className="text-sm text-muted-foreground">You have no saved addresses.</p>
+                  <Button type="button" size="sm" variant="outline" onClick={() => setAddressDialogOpen(true)}>
+                    + Add Address
+                  </Button>
+              </div>
+            ) : shippingAddress ? (
               <CheckoutAddressSelection
                 addresses={addresses}
-                addressFieldName="Shipping Address"
-                value={shippingAddress}
-                onChange={shippingAddressChangeHandle}
+                selectedAddress={shippingAddress}
+                onSelect={shippingAddressChangeHandle}
               />
+            ) : null}
+          </div>
 
-            {/* Payment Method (COD) */}
-            <div>
-              <p className="font-semibold mb-2">Payment Method</p>
-              <div className="space-y-3">
-                <CheckoutRadioInput
-                label="Cash on delivery"
+          {/* PAYMENT METHOD */}
+          <div className="p-4 rounded-xl border bg-muted/50 space-y-4">
+            <h2 className="font-semibold text-lg">Payment Method</h2>
+            <div className="space-y-3">
+              <CheckoutRadioInput
+                label="Cash on Delivery"
                 selected={paymentMethod === "cash_on_delivery"}
                 value="cash_on_delivery"
-                {...register("paymentMethod", { required: true })} />
-                <CheckoutRadioInput
-                label="Debit - Credit card"
+                {...register("paymentMethod", { required: true })}
+              />
+              <CheckoutRadioInput
+                label="Debit / Credit Card"
                 selected={paymentMethod === "card"}
                 value="card"
-                {...register("paymentMethod", { required: true })} />
-              </div>
+                {...register("paymentMethod", { required: true })}
+              />
             </div>
+          </div>
 
-            {/* billingAddress selector */}
-            {paymentMethod === "card" && (
-              <>
-                <PaymentElement />
-                <CheckoutAddressSelection
+          {/* BILLING ADDRESS + STRIPE */}
+          {paymentMethod === "card" && (
+            <div className="p-4 rounded-xl border bg-muted/50 space-y-4">
+              <h2 className="font-semibold text-lg">Billing Details</h2>
+              <PaymentElement />
+              <p className="font-semibold">Billing address</p>
+              {addresses.length === 0 ? (
+                <div className="flex items-center gap-3">
+                  <Checkbox id="same" checked disabled />
+                  <Label htmlFor="same">Same as Shipping address</Label>
+                </div>
+              ) : (
+                <>
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id="same"
+                    checked={useSameAddress}
+                    disabled={addresses.length <= 1}
+                    onCheckedChange={(checked) => {
+                      if (checked && shippingAddress) {
+                        setBillingAddress(shippingAddress);
+                        API.updateCheckoutSessionAddresses(session.token, { billingAddressId: shippingAddress._id });
+                      }
+                      setUseSameAddress(!!checked);
+                    }}
+                  />
+                  <Label htmlFor="same">Same as Shipping address</Label>
+                </div>
+                {!useSameAddress && billingAddress && <CheckoutAddressSelection
                   addresses={addresses}
-                  addressFieldName="Billing Address"
-                  value={billingAddress}
-                  onChange={billingAddressChangeHandle}
-                />
+                  selectedAddress={billingAddress}
+                  onSelect={billingAddressChangeHandle}
+                />}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SIDE - Summary */}
+        <div className="w-full md:w-[350px] flex flex-col gap-6">
+          <h2 className="text-2xl font-bold">Order Summary</h2>
+          <div className="rounded-xl border p-4 bg-muted/50 space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="font-medium">Subtotal</span>
+              <span>{formatCurrency(session.subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium">Shipping</span>
+              <span>{formatCurrency(session.shipping)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium">Tax</span>
+              <span>{formatCurrency(session.tax)}</span>
+            </div>
+            <div className="border-t pt-2 flex justify-between text-base font-semibold">
+              <span>Total</span>
+              <span>{formatCurrency(session.total)}</span>
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full mt-2" size="lg" disabled={formState.isSubmitting}>
+            {formState.isSubmitting ? (
+              <>
+                <LoaderCircle className="animate-spin mr-2 h-4 w-4" />
+                Processing
+              </>
+            ) : formState.isSubmitted ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                {paymentMethod === "cash_on_delivery" ? "Order Placed" : "Payment Confirmed"}
+              </>
+            ) : (
+              <>
+                {paymentMethod === "cash_on_delivery" ? "Place Order" : "Confirm Payment"}
               </>
             )}
-
-          </div>
-        </div>
-        
-        {/* RIGHT: Order Summary */}
-        <div className="w-full md:w-1/3 flex flex-col gap-3">
-          <h2 className="text-xl font-semibold my-3">Order Summary</h2>
-          <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="font-semibold">Subtotal</span>
-                <span>{formatCurrency(session.subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Shipping</span>
-                <span>{formatCurrency(session.shipping)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Tax</span>
-                <span>{formatCurrency(session.tax)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Total</span>
-                <span>{formatCurrency(session.total)}</span>
-              </div>
-          </div>
-          {/* Submit */}
-          <Button
-            type="submit"
-          > 
-            {formState.isSubmitting ? <LoaderCircle className="animate-spin" />: formState.isSubmitted ? <Check /> : null}
-            {formState.isSubmitting ? "Processing" : paymentMethod === "cash_on_delivery" ? formState.isSubmitted ? "Order placed" : "Place Order" : formState.isSubmitted ? "Payment confirmed": "Confirm payment"}
           </Button>
         </div>
       </form>
+      {/* Add/Edit Dialog */}
+      <AddressDialog
+        open={addressDialogOpen}
+        onOpenChange={setAddressDialogOpen}
+        onSubmit={updateAddressesState}
+      />
+    </AddressContext.Provider>
   )
 }
 
