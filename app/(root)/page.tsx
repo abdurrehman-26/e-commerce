@@ -11,25 +11,25 @@ export default async function Home() {
   const SLIDES = [
     {
       imageurl:
-        "https://img.lazcdn.com/us/domino/8d6efb0d-35ac-4611-9664-13404fd5b796_PK-1976-688.jpg_2200x2200q80.jpg_.webp",
+        "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753705937/8d6efb0d-35ac-4611-9664-13404fd5b796_PK-1976-688.jpg_2200x2200q80.jpg__bytjb2.webp",
     },
     {
       imageurl:
-        "https://img.lazcdn.com/us/domino/99887c7a-ecb6-4010-be8b-44f54e295193_PK-1976-688.jpg_2200x2200q80.jpg_.webp",
+        "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753705982/99887c7a-ecb6-4010-be8b-44f54e295193_PK-1976-688.jpg_2200x2200q80.jpg__qltbnz.webp",
     },
     {
       imageurl:
-        "https://img.lazcdn.com/us/domino/a2e8a274-cfb1-41fe-9dee-3b543cde1f75_PK-1976-688.jpg_2200x2200q80.jpg_.webp",
+        "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753705997/a2e8a274-cfb1-41fe-9dee-3b543cde1f75_PK-1976-688.jpg_2200x2200q80.jpg__smr1sj.webp",
     },
     {
       imageurl:
-        "https://img.lazcdn.com/us/domino/ca544c06-44d7-40bf-914c-1d0b54c90c91_PK-1976-688.jpg_2200x2200q80.jpg_.webp",
+        "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753706004/ca544c06-44d7-40bf-914c-1d0b54c90c91_PK-1976-688.jpg_2200x2200q80.jpg__fwbhtr.webp",
     },
   ];
   const promotion = {
-    wide: "https://zerolifestyle.co/cdn/shop/files/Main-banner-Home-page_2.webp?v=1744971500&width=1920",
+    wide: "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753706123/Main-banner-Home-page_2_wuz2x7.jpg",
     small:
-      "https://zerolifestyle.co/cdn/shop/files/Main-banner-mbl-2---Copy.webp?v=1744971501&width=750",
+      "https://res.cloudinary.com/dxpjusmf7/image/upload/v1753706129/Main-banner-mbl-2---Copy_kf7qsd.jpg",
   };
   const initialTrendingProductsRes = await API.getProducts({userCookies})
 

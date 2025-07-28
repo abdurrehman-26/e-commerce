@@ -10,19 +10,6 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'img.lazcdn.com',
-        port: '',
-        pathname: '/**',
-        search: '',
-      },
-      {
-        protocol: 'https',
-        hostname: 'zerolifestyle.co',
-        port: '',
-        pathname: '/**',
-      },
     ],
   },
 };
