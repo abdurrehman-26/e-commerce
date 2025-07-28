@@ -162,7 +162,6 @@ const CheckoutForm = ({session, initialAddresses}: CheckoutFormProps) => {
                 line1: billingAddress.addressLine1,
                 line2: billingAddress.addressLine2,
                 city: billingAddress.city,
-                country: billingAddress.country.code,
                 postal_code: billingAddress.postalCode,
               }
             },

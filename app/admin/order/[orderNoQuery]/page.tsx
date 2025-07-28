@@ -63,7 +63,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<Orde
           <div>
             <p className='font-semibold mb-1'>Contact information</p>
             <Link href="#" className='px-0 text-blue-500 cursor-pointer hover:underline underline-offset-4 text-sm font-semibold'>{orderData.user_details.email}</Link>
-            <p className='text-sm'>03132267247</p>
+            <p className='text-sm'>{orderData.shipping_address.phone}</p>
           </div>
           <AddressDisplayAdminOrder addressTitle='Shipping address' address={orderData.shipping_address} />
           <AddressDisplayAdminOrder addressTitle='Billing address' address={orderData.billing_address} />
