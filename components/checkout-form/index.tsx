@@ -96,6 +96,10 @@ const CheckoutForm = ({session, initialAddresses}: CheckoutFormProps) => {
       setShippingAddress(previous);
       toast.error("Failed to update address. Please try again.");
     }
+
+    if (useSameAddress) {
+      await billingAddressChangeHandle(address)
+    }
   };
 
   const billingAddressChangeHandle = async (address: Address) => {

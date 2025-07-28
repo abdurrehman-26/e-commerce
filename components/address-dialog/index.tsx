@@ -1,14 +1,16 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import API from '@/API'
 import { toast } from 'sonner'
 import { Address } from '../checkout-address-selection'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { countries } from '@/lib/countries'
 
 export type AddressFormValues = {
   _id: string
@@ -54,6 +56,7 @@ export const AddressDialog = ({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<AddressFormValues>({
     defaultValues: EMPTY_ADDRESS
@@ -88,6 +91,11 @@ export const AddressDialog = ({
     onOpenChange(false)
     reset()
   }
+
+  const countryOptions = useMemo(() => countries.map(c => ({
+    label: c.name,
+    value: c.code,
+  })), [])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -135,8 +143,37 @@ export const AddressDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label>Country</Label>
-              <Input {...register('country.name', { required: 'Required' })} placeholder="e.g. Pakistan" />
+              <Controller
+              name="country"
+              control={control}
+              rules={{ required: 'Required' }}
+              render={({ field }) => (
+                <div className="space-y-2">
+                  <Label>Country</Label>
+                  <Select
+                    value={field.value?.code}
+                    onValueChange={(val) => {
+                      const selected = countries.find(c => c.code === val)
+                      field.onChange(selected ? { name: selected.name, code: selected.code } : { name: '', code: '' })
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup className="max-h-60 overflow-y-auto">
+                                {countryOptions.map((country) => (
+                                  <SelectItem key={country.value} value={country.value}>
+                                    {country.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {errors.country?.code && <p className="text-sm text-red-600">{errors.country.code.message}</p>}
+                        </div>
+                      )}
+                    />
               {errors.country?.name && <p className="text-sm text-red-600">{errors.country.name.message}</p>}
             </div>
 
