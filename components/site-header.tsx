@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import SiteLogo from "./site-logo"
+import Link from "next/link"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
@@ -22,7 +23,9 @@ export function SiteHeader() {
           <SidebarIcon />
         </Button>
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <SiteLogo />
+        <Link href="/">
+          <SiteLogo />
+        </Link>
       </div>
     </header>
   )

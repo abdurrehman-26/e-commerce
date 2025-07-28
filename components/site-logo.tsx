@@ -2,9 +2,9 @@ import { Store } from "lucide-react";
 
 export default function SiteLogo () {
     return (
-        <>
-            <Store />
-            <p className="font-bold text-inherit">SHOP</p>
-        </>
+        <div className="flex gap-1">
+          <Store />
+          <p className="font-bold text-inherit">SHOP</p>
+        </div>
     )
 }

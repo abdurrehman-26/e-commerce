@@ -20,7 +20,7 @@ export const Navbar = () => {
         <nav className="hidden justify-between items-center sm:flex gap-2">
           <div className="flex items-center gap-2">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/">
               <SiteLogo />
             </Link>
           </div>
