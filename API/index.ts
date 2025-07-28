@@ -630,6 +630,30 @@ export default class API {
       throw error
     }
   }
+  static async setDefaultAddress({addressID, userCookies}:{addressID: string, userCookies?: ReadonlyRequestCookies}): Promise<{status: "success" | "failed", message: string, addresses: Address[]}> {
+    const requestHeaders = new Headers()
+    if (userCookies) {
+      requestHeaders.append("Cookie", userCookies.toString());
+    }
+    const requestOptions: RequestInit = {
+      method: "PATCH",
+      headers: requestHeaders,
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_SERVER}/api/v1/user/addresses/${addressID}/set-default`,
+        requestOptions,
+      );
+      const result = await response.json();
+
+      return result;
+    } catch (error) {
+      throw error
+    }
+  }
   static async deleteAddress({addressID, userCookies}:{addressID: string, userCookies?: ReadonlyRequestCookies}): Promise<{status: "success" | "failed", message: string, updatedAddress: Address}> {
     const requestHeaders = new Headers()
     if (userCookies) {

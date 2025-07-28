@@ -94,6 +94,22 @@ const AccountAddresses = ({ initialAddresses }: AccountAddressesProps) => {
     setSelectedAddress(null);
   };
 
+  const setAsDefault = async (addressID: string) => {
+    const res = await API.setDefaultAddress({ addressID });
+    if (res.status === "success") {
+      setAddresses(prev =>
+        prev.map(addr => ({
+          ...addr,
+          isDefault: addr._id === addressID
+        }))
+      );
+      toast.success("Default address updated");
+    } else {
+      toast.error(res.message || "Failed to update default address");
+    }
+  };
+
+
 
   return (
     <div className="w-full max-w-3xl py-6 space-y-6">
@@ -142,6 +158,17 @@ const AccountAddresses = ({ initialAddresses }: AccountAddressesProps) => {
                   </div>
 
                   <div className="flex gap-2 mt-1">
+                    {!addr.isDefault && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAsDefault(addr._id)}
+                        className="flex items-center gap-1 cursor-pointer text-green-600 hover:bg-green-50"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Set as Default
+                      </Button>
+                    )}
+
                     <Button
                       variant="outline"
                       size="sm"
