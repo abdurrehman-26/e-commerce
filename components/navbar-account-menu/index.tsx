@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 function NavbarAccountMenu() {
   const isLoggedIn = useAppSelector(state => state.user.isAuthenticated)
   const isAdmin = useAppSelector(state => state.user.data?.isAdmin)
+  const userData = useAppSelector(state => state.user.data)
 
   const [dialogState, setDialogState] = useState<boolean>(false)
 
@@ -64,7 +65,10 @@ function NavbarAccountMenu() {
             </DropdownMenuTrigger>
           </div>
           <DropdownMenuContent className='mt-1 min-w-[200px] mr-4 rounded-sm'>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              <p>My Account</p>
+              <p>Signed in as {userData?.email}</p>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {isAdmin && (
               <>

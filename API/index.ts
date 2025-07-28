@@ -176,11 +176,12 @@ export default class API {
   static async getuser(userCookies?: ReadonlyRequestCookies): Promise<{
     status: "success" | "failed",
     message: string,
-    user: {
+    user?: {
       name: string,
       email: string,
       userID: string,
-      isAdmin: boolean
+      isAdmin: boolean,
+      isSuperAdmin: boolean
     }
   }> {
     const requestHeaders = new Headers()
@@ -848,24 +849,76 @@ export default class API {
   }
 
   static admin = class {
-    static async getUsersList() {
+    static async getUsersList({userCookies}: {userCookies?: ReadonlyRequestCookies}) {
+      const requestHeaders = new Headers()
+      if (userCookies) {
+          requestHeaders.append("Cookie", userCookies.toString());
+      }
       const requestOptions: RequestInit = {
         method: "GET",
         redirect: "follow",
         credentials: "include",
+        headers: requestHeaders
       };
 
       try {
         const response = await fetch(
-          `${API_SERVER}/api/v1/admin/getuserslist`,
+          `${API_SERVER}/api/v1/user/getuserslist`,
           requestOptions,
         );
         const result = await response.json();
 
         return result;
       } catch (error) {
-         
-        console.error(error);
+        throw error
+      }
+    }
+    static async makeAdmin({userCookies, userID}: {userCookies?: ReadonlyRequestCookies, userID: string}) {
+      const requestHeaders = new Headers()
+      if (userCookies) {
+          requestHeaders.append("Cookie", userCookies.toString());
+      }
+      const requestOptions: RequestInit = {
+        method: "PATCH",
+        redirect: "follow",
+        credentials: "include",
+        headers: requestHeaders
+      };
+
+      try {
+        const response = await fetch(
+          `${API_SERVER}/api/v1/user/make-admin/${userID}`,
+          requestOptions,
+        );
+        const result = await response.json();
+
+        return result;
+      } catch (error) {
+        throw error
+      }
+    }
+    static async downgradeAdmin({userCookies, userID}: {userCookies?: ReadonlyRequestCookies, userID: string}) {
+      const requestHeaders = new Headers()
+      if (userCookies) {
+          requestHeaders.append("Cookie", userCookies.toString());
+      }
+      const requestOptions: RequestInit = {
+        method: "PATCH",
+        redirect: "follow",
+        credentials: "include",
+        headers: requestHeaders
+      };
+
+      try {
+        const response = await fetch(
+          `${API_SERVER}/api/v1/user/downgrade-admin/${userID}`,
+          requestOptions,
+        );
+        const result = await response.json();
+
+        return result;
+      } catch (error) {
+        throw error
       }
     }
     static async getAllTableProducts() {
@@ -934,7 +987,6 @@ export default class API {
       console.error(error);
     }
     }
-
     static async updateOrderStatus(
       orderNo: string,
       status: "pending" | "processing" | "shipped" | "delivered",
@@ -974,7 +1026,6 @@ export default class API {
         return { status: false, message: "Network connection error" };
       }
     }
-
     static async updateOrderPaymentStatus(
       orderNo: string,
       paymentStatus: "unpaid" | "paid",
